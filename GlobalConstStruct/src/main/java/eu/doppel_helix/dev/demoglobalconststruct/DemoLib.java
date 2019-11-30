@@ -13,7 +13,7 @@ public interface DemoLib extends Library {
     @Structure.FieldOrder({"x", "y"})
     class Point extends Structure {
 
-        public int x, y;
+        public volatile int x, y;
 
         public Point() {
         }
