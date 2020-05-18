@@ -1,1 +1,4 @@
 /target/
+/JavaModuleSystemJigsaw/target/
+/JNA-JavaModuleSystemJigsaw/target/
+/JNA-JPMS-Jigsaw/target/
