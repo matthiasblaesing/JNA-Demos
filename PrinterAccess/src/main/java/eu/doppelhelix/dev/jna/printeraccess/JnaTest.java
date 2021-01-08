@@ -42,19 +42,13 @@ public class JnaTest {
       optionsType.setFields(new short[] { JOB_NOTIFY_FIELD_PRINTER_NAME, JOB_NOTIFY_FIELD_STATUS, JOB_NOTIFY_FIELD_DOCUMENT });
       optionsType.toArray(1);
       options.pTypes = optionsType;
-      options.write();
-      /*
-       * it would have been better to bind the final argument of
-       * FindNextPrinterChangeNotification directly as either a Structure
-       * type or directly with PRINTER_NOTIFY_TYPE - might be a worthy overload
-       */
-      WinDef.LPVOID optionsPointer = new WinDef.LPVOID(options.getPointer());
-      WinNT.HANDLE changeNotificationsHandle = Winspool.INSTANCE.FindFirstPrinterChangeNotification(printServerHandle.getValue(),
+
+      WinNT.HANDLE changeNotificationsHandle = Winspool2.INSTANCE.FindFirstPrinterChangeNotification(printServerHandle.getValue(),
                                                                                                     Winspool.PRINTER_CHANGE_ADD_JOB
                                                                                                     | Winspool.PRINTER_CHANGE_SET_JOB
                                                                                                     | Winspool.PRINTER_CHANGE_DELETE_JOB,
                                                                                                     TWO_DIMENSIONAL_PRINTERS,
-                                                                                                    optionsPointer);
+                                                                                                    options);
       if (!isValidHandle(changeNotificationsHandle)) {
         int errorCode = Kernel32.INSTANCE.GetLastError();
         throw new RuntimeException("Failed to get a change handle - " + errorCode);
@@ -71,15 +65,11 @@ public class JnaTest {
           // requires a pointer sized buffer. That buffer is filled with a
           // pointer to a structure, that holds the actual data. The structure
           // is allocated by the infrastructure and needs to be freed by us.
-          //
-          // It would have been better to bind the final argument of
-          // FindNextPrinterChangeNotification directly as PointerByReference -
-          // might be a worthy overload.
           PointerByReference ppPrinterNotifyInfo = new PointerByReference();
-          success = Winspool.INSTANCE.FindNextPrinterChangeNotification(changeNotificationsHandle,
+          success = Winspool2.INSTANCE.FindNextPrinterChangeNotification(changeNotificationsHandle,
                                                                         change,
-                                                                        optionsPointer,
-                                                                        new WinDef.LPVOID(ppPrinterNotifyInfo.getPointer()));
+                                                                        options,
+                                                                        ppPrinterNotifyInfo);
           if (!success) {
             int errorCode = Kernel32.INSTANCE.GetLastError();
             throw new RuntimeException("Failed to get printer change notification - " + errorCode);

@@ -7,6 +7,9 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
 import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -163,4 +166,14 @@ public interface Winspool2  extends StdCallLibrary {
 
   // See https://docs.microsoft.com/en-us/windows/win32/printdocs/freeprinternotifyinfo
   public boolean FreePrinterNotifyInfo(Pointer pni);
+
+  boolean FindNextPrinterChangeNotification(
+    WinNT.HANDLE hChange,
+    WinDef.DWORDByReference pdwChange,
+    PRINTER_NOTIFY_OPTIONS pPrinterNotifyOptions,
+    PointerByReference ppPrinterNotifyInfo);
+
+  HANDLE FindFirstPrinterChangeNotification(
+    HANDLE hPrinter, int fdwFilter, int fdwOptions,
+    PRINTER_NOTIFY_OPTIONS pPrinterNotifyOptions);
 }
