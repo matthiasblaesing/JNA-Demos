@@ -1,12 +1,18 @@
 
 package eu.doppelhelix.dev.jna.printeraccess;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
 import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.win32.StdCallLibrary;
+import com.sun.jna.win32.W32APIOptions;
 
-public class Winspool2 {
+public interface Winspool2  extends StdCallLibrary {
+
+  Winspool2 INSTANCE = Native.load("Winspool.drv", Winspool2.class, W32APIOptions.DEFAULT_OPTIONS);
 
   @Structure.FieldOrder({ "Version", "Flags", "Count", "pTypes" })
   public static class PRINTER_NOTIFY_OPTIONS extends Structure {
@@ -41,7 +47,17 @@ public class Winspool2 {
     public int Count;
 
     public Pointer pFields;
-    
+
+    public void setFields(short[] fields) {
+        Memory fieldsMemory = new Memory(fields.length * 2 /* size of short in bytes*/);
+        fieldsMemory.write(0, fields, 0, fields.length);
+        pFields = fieldsMemory;
+        Count = fields.length;
+    }
+
+    public short[] getFields() {
+        return pFields.getShortArray(0, Count);
+    }
   }
 
   @Structure.FieldOrder({ "Version", "Flags", "Count", "aData" })
@@ -60,6 +76,21 @@ public class Winspool2 {
     public int Count;
 
     public PRINTER_NOTIFY_INFO_DATA[] aData = new PRINTER_NOTIFY_INFO_DATA[1];
+
+    @Override
+    public void read() {
+        // This is a gross hack - zero sized arrays are a problem for the JNA
+        // API, so it is special cased here
+        int count = (int) readField("Count");
+        aData = new PRINTER_NOTIFY_INFO_DATA[count];
+        if(count == 0) {
+            Count = count;
+            Version = (int) readField("Version");
+            Flags = (int) readField("Flags");
+        } else {
+            super.read();
+        }
+    }
 
   }
 
@@ -130,4 +161,6 @@ public class Winspool2 {
     }
   }
 
+  // See https://docs.microsoft.com/en-us/windows/win32/printdocs/freeprinternotifyinfo
+  public boolean FreePrinterNotifyInfo(Pointer pni);
 }
