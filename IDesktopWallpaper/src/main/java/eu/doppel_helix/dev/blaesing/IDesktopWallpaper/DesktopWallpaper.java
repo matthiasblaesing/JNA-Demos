@@ -162,10 +162,11 @@ public class DesktopWallpaper extends Unknown {
         }
     }
 
-    public void SetWallpaper(int monitorIdx, String path) {
+    public void SetWallpaper(String monitorIdx, String path) {
+        WString wMonitorIdx = new WString(monitorIdx);
         WString wstring = new WString(path);
         HRESULT result = (HRESULT) this._invokeNativeObject(VTABLE_ID_SET_WALLPAPER,
-                new Object[]{this.getPointer(), monitorIdx, wstring},
+                new Object[]{this.getPointer(), wMonitorIdx, wstring},
                 HRESULT.class);
         COMUtils.checkRC(result);
     }
