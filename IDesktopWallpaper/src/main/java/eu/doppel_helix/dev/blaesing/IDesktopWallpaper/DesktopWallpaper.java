@@ -141,13 +141,14 @@ public class DesktopWallpaper extends Unknown {
         return resultValue;
     }
 
-    public String GetWallpaper(int monitorIdx) {
+    public String GetWallpaper(String monitorId) {
+        WString wMonitorId = new WString(monitorId);
         // The documentation says, that the second parameter is a pointer to a
         // LPWSTR, we will allocate a pointer sized buffer, where the pointer
         // to the wchar array will be placed
         PointerByReference pbr = new PointerByReference();
         HRESULT result = (HRESULT) this._invokeNativeObject(VTABLE_ID_GET_WALLPAPER,
-                new Object[]{this.getPointer(), monitorIdx, pbr},
+                new Object[]{this.getPointer(), wMonitorId, pbr},
                 HRESULT.class);
         COMUtils.checkRC(result);
         if (pbr.getValue() != null) {

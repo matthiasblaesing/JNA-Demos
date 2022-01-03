@@ -45,14 +45,15 @@ public class Main {
                     // Get the device name
                     String deviceName = wallpaper.GetMonitorDevicePathAt(i);
                     // Get the current wallpaper
-                    String wallpaperName = wallpaper.GetWallpaper(i);
+                    String wallpaperName = wallpaper.GetWallpaper(deviceName);
                     // Get the dimensions of the monitor
                     RECT rect = wallpaper.GetMonitorRect(deviceName);
                     DESKTOP_WALLPAPER_POSITION position = wallpaper.GetPosition();
                     System.out.printf("%40s: bottom: %d/ left: %d/ right: %d/ top: %d%n", deviceName, rect.bottom, rect.left, rect.right, rect.top);
                     System.out.printf("\t%s (%s)%n", wallpaperName, position);
                     // Set a new wallpaper
-                    wallpaper.SetWallpaper(i, "c:\\windows\\web\\wallpaper\\theme1\\img13.jpg");
+                    wallpaper.SetWallpaper(deviceName, "c:\\windows\\web\\wallpaper\\theme1\\img13.jpg");
+//                    wallpaper.SetWallpaper(deviceName, "c:\\windows\\web\\wallpaper\\theme1\\img1.jpg");
                 }
             } finally {
                 // COM objects are reference counted, so release the objects
